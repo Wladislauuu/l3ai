@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Тест ассоциативных связей</title>
+<title>Тест ассоциативных связей (оптимизированный)</title>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 body {
@@ -117,7 +117,6 @@ button:active { transform: scale(0.96); }
 }
 .status { font-size: 15px; color: #666; margin: 15px 0; }
 
-/* Большие кнопки для мобильных */
 .big-button {
     display: block;
     width: 100%;
@@ -152,7 +151,6 @@ button:active { transform: scale(0.96); }
     margin: 0;
 }
 
-/* Скрываем подсказки про клавиши на мобильных */
 @media (max-width: 768px) {
     .keys-hint { display: none; }
     .container { padding: 15px; }
@@ -177,7 +175,7 @@ button:active { transform: scale(0.96); }
             <li>Отвечайте быстро, но точно!</li>
         </ul>
         <div class="warning">
-            <strong>Важно:</strong> Сначала будут тренировочные вопросы (не учитываются в результатах), затем основной тест (~10-15 минут). Постарайтесь не отвлекаться.
+            <strong>Важно:</strong> Сначала будут тренировочные вопросы (не учитываются в результатах), затем основной тест (~7-9 минут). Постарайтесь не отвлекаться.
         </div>
     </div>
     <div class="input-group">
@@ -201,7 +199,7 @@ button:active { transform: scale(0.96); }
 
 <div id="question-screen" class="screen">
     <div class="question-box">
-        <div id="training-badge-q" class="training-badge" style="display:none;">🎯 Тренировочный вопрос</div>
+        <div id="training-badge-q" class="training-badge" style="display:none;"> Тренировочный вопрос</div>
         <p class="question-text" id="question-text"></p>
         <div class="keys-hint">
             <div class="key-hint"><span class="key">←</span><span>НЕТ</span></div>
@@ -226,9 +224,12 @@ button:active { transform: scale(0.96); }
 
 <script>
 // ⚠️ ВСТАВЬ СЮДА СВОИ ДАННЫЕ ОТ BOTFATHER ⚠️
-const BOT_TOKEN = "8845905627:AAGMxF3SocO1AZLUjH43YWFw8js7pQfWPIg";
-const CHAT_ID = "1375315950";
+const BOT_TOKEN = "ВСТАВЬ_СЮДА_ТОКЕН_ОТ_BOTFATHER";
+const CHAT_ID = "ВСТАВЬ_СЮДА_CHAT_ID_ЧИСЛОМ";
 
+// ============================================
+// ТРЕНИРОВОЧНЫЕ ВОПРОСЫ (6 штук, не учитываются)
+// ============================================
 const practiceQuestions = [
     {id:"P1",text:"Гандбол — это командный спорт",answer:1,type:"is_a",level:"",subject:"Гандбол",phase:"practice"},
     {id:"P2",text:"Гольф — командный спорт",answer:0,type:"false_is_a",level:"",subject:"Гольф",phase:"practice"},
@@ -238,127 +239,96 @@ const practiceQuestions = [
     {id:"P6",text:"Лыжи — игра с мячом",answer:0,type:"false_is_a",level:"",subject:"Лыжи",phase:"practice"}
 ];
 
+// ============================================
+// ОСНОВНЫЕ ВОПРОСЫ (60 штук)
+// Распределение:
+//   is_a:       12 (по 4 на уровень 1, 2, 3)
+//   property:   12 (по 4 на уровень 1, 2, 3)
+//   exception:   6 (специфические свойства)
+//   false_property: 12
+//   false_is_a:     12
+//   false_far:       6
+// ============================================
 const testQuestions = [
-{id:"Q001",text:"Футбольный мяч круглый",answer:1,type:"property",level:1,subject:"Футбол"},
-{id:"Q002",text:"В футболе есть вратарь",answer:1,type:"property",level:1,subject:"Футбол"},
-{id:"Q003",text:"Мяч для регби овальный",answer:1,type:"exception",level:1,subject:"Регби"},
-{id:"Q004",text:"В баскетболе мяч бросают в кольцо",answer:1,type:"property",level:1,subject:"Баскетбол"},
-{id:"Q005",text:"В волейболе мяч перебрасывают через сетку",answer:1,type:"property",level:1,subject:"Волейбол"},
-{id:"Q006",text:"В хоккее играют клюшкой",answer:1,type:"property",level:1,subject:"Хоккей"},
-{id:"Q007",text:"В хоккее используют шайбу",answer:1,type:"property",level:1,subject:"Хоккей"},
-{id:"Q008",text:"В теннисе используют ракетку",answer:1,type:"property",level:1,subject:"Теннис"},
-{id:"Q009",text:"В бадминтоне используют волан",answer:1,type:"property",level:1,subject:"Бадминтон"},
-{id:"Q010",text:"В боксе используют перчатки",answer:1,type:"property",level:1,subject:"Бокс"},
-{id:"Q011",text:"В дзюдо надевают кимоно",answer:1,type:"property",level:1,subject:"Дзюдо"},
-{id:"Q012",text:"Плавание проходит в бассейне",answer:1,type:"property",level:1,subject:"Плавание"},
-{id:"Q013",text:"В керлинге используют щётки",answer:1,type:"property",level:1,subject:"Керлинг"},
-{id:"Q014",text:"Бегуны соревнуются в скорости",answer:1,type:"property",level:1,subject:"Бег"},
-{id:"Q015",text:"Футбол — это игра с мячом",answer:1,type:"is_a",level:1,subject:"Футбол"},
-{id:"Q016",text:"Баскетбол — это игра с мячом",answer:1,type:"is_a",level:1,subject:"Баскетбол"},
-{id:"Q017",text:"Волейбол — это игра с мячом",answer:1,type:"is_a",level:1,subject:"Волейбол"},
-{id:"Q018",text:"Теннис — это игра с ракеткой",answer:1,type:"is_a",level:1,subject:"Теннис"},
-{id:"Q019",text:"Бокс — это единоборство",answer:1,type:"is_a",level:1,subject:"Бокс"},
-{id:"Q020",text:"Дзюдо — это единоборство",answer:1,type:"is_a",level:1,subject:"Дзюдо"},
-{id:"Q021",text:"Хоккей — это командный спорт",answer:1,type:"is_a",level:1,subject:"Хоккей"},
-{id:"Q022",text:"Керлинг — это командный спорт",answer:1,type:"is_a",level:1,subject:"Керлинг"},
-{id:"Q023",text:"Плавание — это индивидуальный спорт",answer:1,type:"is_a",level:1,subject:"Плавание"},
-{id:"Q024",text:"Бег — это индивидуальный спорт",answer:1,type:"is_a",level:1,subject:"Бег"},
-{id:"Q025",text:"Футбол — это командный спорт",answer:1,type:"is_a",level:2,subject:"Футбол"},
-{id:"Q026",text:"Баскетбол — это командный спорт",answer:1,type:"is_a",level:2,subject:"Баскетбол"},
-{id:"Q027",text:"Волейбол — это командный спорт",answer:1,type:"is_a",level:2,subject:"Волейбол"},
-{id:"Q028",text:"Регби — это командный спорт",answer:1,type:"is_a",level:2,subject:"Регби"},
-{id:"Q029",text:"Теннис — это индивидуальный спорт",answer:1,type:"is_a",level:2,subject:"Теннис"},
-{id:"Q030",text:"Бадминтон — это индивидуальный спорт",answer:1,type:"is_a",level:2,subject:"Бадминтон"},
-{id:"Q031",text:"Бокс — это индивидуальный спорт",answer:1,type:"is_a",level:2,subject:"Бокс"},
-{id:"Q032",text:"Дзюдо — это индивидуальный спорт",answer:1,type:"is_a",level:2,subject:"Дзюдо"},
-{id:"Q033",text:"Хоккей — это спорт",answer:1,type:"is_a",level:2,subject:"Хоккей"},
-{id:"Q034",text:"Плавание — это спорт",answer:1,type:"is_a",level:2,subject:"Плавание"},
-{id:"Q035",text:"Бег — это спорт",answer:1,type:"is_a",level:2,subject:"Бег"},
-{id:"Q036",text:"Керлинг — это спорт",answer:1,type:"is_a",level:2,subject:"Керлинг"},
-{id:"Q037",text:"В футболе используют мяч",answer:1,type:"property",level:2,subject:"Футбол"},
-{id:"Q038",text:"В баскетболе используют мяч",answer:1,type:"property",level:2,subject:"Баскетбол"},
-{id:"Q039",text:"В волейболе используют мяч",answer:1,type:"property",level:2,subject:"Волейбол"},
-{id:"Q040",text:"В регби используют мяч",answer:1,type:"property",level:2,subject:"Регби"},
-{id:"Q041",text:"В теннисе играют через сетку",answer:1,type:"property",level:2,subject:"Теннис"},
-{id:"Q042",text:"В бадминтоне играют через сетку",answer:1,type:"property",level:2,subject:"Бадминтон"},
-{id:"Q043",text:"В боксе есть соперник",answer:1,type:"property",level:2,subject:"Бокс"},
-{id:"Q044",text:"В дзюдо есть соперник",answer:1,type:"property",level:2,subject:"Дзюдо"},
-{id:"Q045",text:"Футбол — это спорт",answer:1,type:"is_a",level:3,subject:"Футбол"},
-{id:"Q046",text:"Баскетбол — это спорт",answer:1,type:"is_a",level:3,subject:"Баскетбол"},
-{id:"Q047",text:"Волейбол — это спорт",answer:1,type:"is_a",level:3,subject:"Волейбол"},
-{id:"Q048",text:"Регби — это спорт",answer:1,type:"is_a",level:3,subject:"Регби"},
-{id:"Q049",text:"Теннис — это спорт",answer:1,type:"is_a",level:3,subject:"Теннис"},
-{id:"Q050",text:"Бадминтон — это спорт",answer:1,type:"is_a",level:3,subject:"Бадминтон"},
-{id:"Q051",text:"Бокс — это спорт",answer:1,type:"is_a",level:3,subject:"Бокс"},
-{id:"Q052",text:"Дзюдо — это спорт",answer:1,type:"is_a",level:3,subject:"Дзюдо"},
-{id:"Q053",text:"В футболе есть правила",answer:1,type:"property",level:3,subject:"Футбол"},
-{id:"Q054",text:"В баскетболе есть судья",answer:1,type:"property",level:3,subject:"Баскетбол"},
-{id:"Q055",text:"В теннисе есть судья",answer:1,type:"property",level:3,subject:"Теннис"},
-{id:"Q056",text:"В боксе есть судья",answer:1,type:"property",level:3,subject:"Бокс"},
-{id:"Q057",text:"Футболисты участвуют в соревнованиях",answer:1,type:"property",level:3,subject:"Футбол"},
-{id:"Q058",text:"Теннисисты участвуют в соревнованиях",answer:1,type:"property",level:3,subject:"Теннис"},
-{id:"Q059",text:"Боксёры проводят тренировки",answer:1,type:"property",level:3,subject:"Бокс"},
-{id:"Q060",text:"В регби есть судья",answer:1,type:"property",level:3,subject:"Регби"},
-{id:"Q061",text:"В футболе используют ракетку",answer:0,type:"false_property",subject:"Футбол"},
-{id:"Q062",text:"В теннисе используют шайбу",answer:0,type:"false_property",subject:"Теннис"},
-{id:"Q063",text:"В боксе используют мяч",answer:0,type:"false_property",subject:"Бокс"},
-{id:"Q064",text:"В хоккее используют волан",answer:0,type:"false_property",subject:"Хоккей"},
-{id:"Q065",text:"В баскетболе играют клюшкой",answer:0,type:"false_property",subject:"Баскетбол"},
-{id:"Q066",text:"В плавании используют перчатки",answer:0,type:"false_property",subject:"Плавание"},
-{id:"Q067",text:"В дзюдо используют ракетку",answer:0,type:"false_property",subject:"Дзюдо"},
-{id:"Q068",text:"В волейболе используют шайбу",answer:0,type:"false_property",subject:"Волейбол"},
-{id:"Q069",text:"В бадминтоне используют перчатки",answer:0,type:"false_property",subject:"Бадминтон"},
-{id:"Q070",text:"В керлинге используют ракетку",answer:0,type:"false_property",subject:"Керлинг"},
-{id:"Q071",text:"В беге используют мяч",answer:0,type:"false_property",subject:"Бег"},
-{id:"Q072",text:"В регби используют шайбу",answer:0,type:"false_property",subject:"Регби"},
-{id:"Q073",text:"Мяч для регби круглый",answer:0,type:"false_exception",subject:"Регби"},
-{id:"Q074",text:"Футбольный мяч овальный",answer:0,type:"false_property",subject:"Футбол"},
-{id:"Q075",text:"Хоккеисты надевают кимоно",answer:0,type:"false_property",subject:"Хоккей"},
-{id:"Q076",text:"В баскетболе используют шайбу",answer:0,type:"false_property",subject:"Баскетбол"},
-{id:"Q077",text:"В баскетболе используют ракетку",answer:0,type:"false_property",subject:"Баскетбол"},
-{id:"Q078",text:"В волейболе играют клюшкой",answer:0,type:"false_property",subject:"Волейбол"},
-{id:"Q079",text:"В теннисе играют клюшкой",answer:0,type:"false_property",subject:"Теннис"},
-{id:"Q080",text:"В боксе играют через сетку",answer:0,type:"false_property",subject:"Бокс"},
-{id:"Q081",text:"В плавании используют ракетку",answer:0,type:"false_property",subject:"Плавание"},
-{id:"Q082",text:"В дзюдо используют шайбу",answer:0,type:"false_property",subject:"Дзюдо"},
-{id:"Q083",text:"В беге используют клюшку",answer:0,type:"false_property",subject:"Бег"},
-{id:"Q084",text:"В керлинге используют волан",answer:0,type:"false_property",subject:"Керлинг"},
-{id:"Q085",text:"В хоккее используют ракетку",answer:0,type:"false_property",subject:"Хоккей"},
-{id:"Q086",text:"В регби используют ракетку",answer:0,type:"false_property",subject:"Регби"},
-{id:"Q087",text:"В боксе используют клюшку",answer:0,type:"false_property",subject:"Бокс"},
-{id:"Q088",text:"В футболе надевают кимоно",answer:0,type:"false_property",subject:"Футбол"},
-{id:"Q089",text:"Футбол — это индивидуальный спорт",answer:0,type:"false_is_a",subject:"Футбол"},
-{id:"Q090",text:"Баскетбол — это индивидуальный спорт",answer:0,type:"false_is_a",subject:"Баскетбол"},
-{id:"Q091",text:"Волейбол — это индивидуальный спорт",answer:0,type:"false_is_a",subject:"Волейбол"},
-{id:"Q092",text:"Хоккей — это индивидуальный спорт",answer:0,type:"false_is_a",subject:"Хоккей"},
-{id:"Q093",text:"Теннис — это командный спорт",answer:0,type:"false_is_a",subject:"Теннис"},
-{id:"Q094",text:"Бокс — это командный спорт",answer:0,type:"false_is_a",subject:"Бокс"},
-{id:"Q095",text:"Дзюдо — это командный спорт",answer:0,type:"false_is_a",subject:"Дзюдо"},
-{id:"Q096",text:"Плавание — это командный спорт",answer:0,type:"false_is_a",subject:"Плавание"},
-{id:"Q097",text:"Бег — это командный спорт",answer:0,type:"false_is_a",subject:"Бег"},
-{id:"Q098",text:"Бадминтон — это командный спорт",answer:0,type:"false_is_a",subject:"Бадминтон"},
-{id:"Q099",text:"Футбол — это единоборство",answer:0,type:"false_is_a",subject:"Футбол"},
-{id:"Q100",text:"Баскетбол — это игра с ракеткой",answer:0,type:"false_is_a",subject:"Баскетбол"},
-{id:"Q101",text:"Теннис — это единоборство",answer:0,type:"false_is_a",subject:"Теннис"},
-{id:"Q102",text:"Бокс — это игра с мячом",answer:0,type:"false_is_a",subject:"Бокс"},
-{id:"Q103",text:"Дзюдо — это игра с ракеткой",answer:0,type:"false_is_a",subject:"Дзюдо"},
-{id:"Q104",text:"Плавание — это игра с мячом",answer:0,type:"false_is_a",subject:"Плавание"},
-{id:"Q105",text:"Бег — это единоборство",answer:0,type:"false_is_a",subject:"Бег"},
-{id:"Q106",text:"Бадминтон — это единоборство",answer:0,type:"false_is_a",subject:"Бадминтон"},
-{id:"Q107",text:"Регби — это игра с ракеткой",answer:0,type:"false_is_a",subject:"Регби"},
-{id:"Q108",text:"Керлинг — это игра с мячом",answer:0,type:"false_is_a",subject:"Керлинг"},
-{id:"Q109",text:"Бокс — это игра с ракеткой",answer:0,type:"false_is_a",subject:"Бокс"},
-{id:"Q110",text:"Футбол — это игра с ракеткой",answer:0,type:"false_is_a",subject:"Футбол"},
-{id:"Q111",text:"Хоккей — это единоборство",answer:0,type:"false_is_a",subject:"Хоккей"},
-{id:"Q112",text:"Регби — это индивидуальный спорт",answer:0,type:"false_is_a",subject:"Регби"},
-{id:"Q113",text:"Керлинг — это индивидуальный спорт",answer:0,type:"false_is_a",subject:"Керлинг"},
-{id:"Q114",text:"Плавание — это единоборство",answer:0,type:"false_is_a",subject:"Плавание"},
-{id:"Q115",text:"Футбол — это вид транспорта",answer:0,type:"false_far",subject:"Футбол"},
-{id:"Q116",text:"Теннис — это животное",answer:0,type:"false_far",subject:"Теннис"},
-{id:"Q117",text:"Бокс — это фрукт",answer:0,type:"false_far",subject:"Бокс"},
-{id:"Q118",text:"Хоккей — это музыкальный жанр",answer:0,type:"false_far",subject:"Хоккей"},
-{id:"Q119",text:"Плавание — это язык",answer:0,type:"false_far",subject:"Плавание"},
-{id:"Q120",text:"Бег — это напиток",answer:0,type:"false_far",subject:"Бег"}
+    // ===== is_a УРОВЕНЬ 1 (4 вопроса) =====
+    {id:"Q015",text:"Футбол — это игра с мячом",answer:1,type:"is_a",level:1,subject:"Футбол"},
+    {id:"Q016",text:"Баскетбол — это игра с мячом",answer:1,type:"is_a",level:1,subject:"Баскетбол"},
+    {id:"Q019",text:"Бокс — это единоборство",answer:1,type:"is_a",level:1,subject:"Бокс"},
+    {id:"Q020",text:"Дзюдо — это единоборство",answer:1,type:"is_a",level:1,subject:"Дзюдо"},
+    
+    // ===== is_a УРОВЕНЬ 2 (4 вопроса) =====
+    {id:"Q025",text:"Футбол — это командный спорт",answer:1,type:"is_a",level:2,subject:"Футбол"},
+    {id:"Q026",text:"Баскетбол — это командный спорт",answer:1,type:"is_a",level:2,subject:"Баскетбол"},
+    {id:"Q029",text:"Теннис — это индивидуальный спорт",answer:1,type:"is_a",level:2,subject:"Теннис"},
+    {id:"Q032",text:"Дзюдо — это индивидуальный спорт",answer:1,type:"is_a",level:2,subject:"Дзюдо"},
+    
+    // ===== is_a УРОВЕНЬ 3 (4 вопроса) =====
+    {id:"Q045",text:"Футбол — это спорт",answer:1,type:"is_a",level:3,subject:"Футбол"},
+    {id:"Q046",text:"Баскетбол — это спорт",answer:1,type:"is_a",level:3,subject:"Баскетбол"},
+    {id:"Q049",text:"Теннис — это спорт",answer:1,type:"is_a",level:3,subject:"Теннис"},
+    {id:"Q052",text:"Дзюдо — это спорт",answer:1,type:"is_a",level:3,subject:"Дзюдо"},
+    
+    // ===== property УРОВЕНЬ 1 (4 вопроса) =====
+    {id:"Q001",text:"Футбольный мяч круглый",answer:1,type:"property",level:1,subject:"Футбол"},
+    {id:"Q002",text:"В футболе есть вратарь",answer:1,type:"property",level:1,subject:"Футбол"},
+    {id:"Q006",text:"В хоккее играют клюшкой",answer:1,type:"property",level:1,subject:"Хоккей"},
+    {id:"Q007",text:"В хоккее используют шайбу",answer:1,type:"property",level:1,subject:"Хоккей"},
+    
+    // ===== property УРОВЕНЬ 2 (4 вопроса) =====
+    {id:"Q037",text:"В футболе используют мяч",answer:1,type:"property",level:2,subject:"Футбол"},
+    {id:"Q038",text:"В баскетболе используют мяч",answer:1,type:"property",level:2,subject:"Баскетбол"},
+    {id:"Q041",text:"В теннисе играют через сетку",answer:1,type:"property",level:2,subject:"Теннис"},
+    {id:"Q043",text:"В боксе есть соперник",answer:1,type:"property",level:2,subject:"Бокс"},
+    
+    // ===== property УРОВЕНЬ 3 (4 вопроса) =====
+    {id:"Q053",text:"В футболе есть правила",answer:1,type:"property",level:3,subject:"Футбол"},
+    {id:"Q054",text:"В баскетболе есть судья",answer:1,type:"property",level:3,subject:"Баскетбол"},
+    {id:"Q056",text:"В боксе есть судья",answer:1,type:"property",level:3,subject:"Бокс"},
+    {id:"Q057",text:"Футболисты участвуют в соревнованиях",answer:1,type:"property",level:3,subject:"Футбол"},
+    
+    // ===== exception (6 вопросов - специфические свойства) =====
+    {id:"Q003",text:"Мяч для регби овальный",answer:1,type:"exception",level:1,subject:"Регби"},
+    {id:"Q009",text:"В бадминтоне используют волан",answer:1,type:"exception",level:1,subject:"Бадминтон"},
+    {id:"Q011",text:"В дзюдо надевают кимоно",answer:1,type:"exception",level:1,subject:"Дзюдо"},
+    {id:"Q013",text:"В керлинге используют щётки",answer:1,type:"exception",level:1,subject:"Керлинг"},
+    {id:"Q008",text:"В теннисе используют ракетку",answer:1,type:"exception",level:1,subject:"Теннис"},
+    {id:"Q010",text:"В боксе используют перчатки",answer:1,type:"exception",level:1,subject:"Бокс"},
+    
+    // ===== false_property (12 вопросов) =====
+    {id:"Q061",text:"В футболе используют ракетку",answer:0,type:"false_property",subject:"Футбол"},
+    {id:"Q062",text:"В теннисе используют шайбу",answer:0,type:"false_property",subject:"Теннис"},
+    {id:"Q063",text:"В боксе используют мяч",answer:0,type:"false_property",subject:"Бокс"},
+    {id:"Q064",text:"В хоккее используют волан",answer:0,type:"false_property",subject:"Хоккей"},
+    {id:"Q065",text:"В баскетболе играют клюшкой",answer:0,type:"false_property",subject:"Баскетбол"},
+    {id:"Q066",text:"В плавании используют перчатки",answer:0,type:"false_property",subject:"Плавание"},
+    {id:"Q067",text:"В дзюдо используют ракетку",answer:0,type:"false_property",subject:"Дзюдо"},
+    {id:"Q068",text:"В волейболе используют шайбу",answer:0,type:"false_property",subject:"Волейбол"},
+    {id:"Q069",text:"В бадминтоне используют перчатки",answer:0,type:"false_property",subject:"Бадминтон"},
+    {id:"Q070",text:"В керлинге используют ракетку",answer:0,type:"false_property",subject:"Керлинг"},
+    {id:"Q071",text:"В беге используют мяч",answer:0,type:"false_property",subject:"Бег"},
+    {id:"Q072",text:"В регби используют шайбу",answer:0,type:"false_property",subject:"Регби"},
+    
+    // ===== false_is_a (12 вопросов) =====
+    {id:"Q089",text:"Футбол — это индивидуальный спорт",answer:0,type:"false_is_a",subject:"Футбол"},
+    {id:"Q090",text:"Баскетбол — это индивидуальный спорт",answer:0,type:"false_is_a",subject:"Баскетбол"},
+    {id:"Q091",text:"Волейбол — это индивидуальный спорт",answer:0,type:"false_is_a",subject:"Волейбол"},
+    {id:"Q092",text:"Хоккей — это индивидуальный спорт",answer:0,type:"false_is_a",subject:"Хоккей"},
+    {id:"Q093",text:"Теннис — это командный спорт",answer:0,type:"false_is_a",subject:"Теннис"},
+    {id:"Q094",text:"Бокс — это командный спорт",answer:0,type:"false_is_a",subject:"Бокс"},
+    {id:"Q095",text:"Дзюдо — это командный спорт",answer:0,type:"false_is_a",subject:"Дзюдо"},
+    {id:"Q096",text:"Плавание — это командный спорт",answer:0,type:"false_is_a",subject:"Плавание"},
+    {id:"Q097",text:"Бег — это командный спорт",answer:0,type:"false_is_a",subject:"Бег"},
+    {id:"Q098",text:"Бадминтон — это командный спорт",answer:0,type:"false_is_a",subject:"Бадминтон"},
+    {id:"Q099",text:"Футбол — это единоборство",answer:0,type:"false_is_a",subject:"Футбол"},
+    {id:"Q100",text:"Баскетбол — это игра с ракеткой",answer:0,type:"false_is_a",subject:"Баскетбол"},
+    
+    // ===== false_far (6 вопросов - абсурдные связи) =====
+    {id:"Q115",text:"Футбол — это вид транспорта",answer:0,type:"false_far",subject:"Футбол"},
+    {id:"Q116",text:"Теннис — это животное",answer:0,type:"false_far",subject:"Теннис"},
+    {id:"Q117",text:"Бокс — это фрукт",answer:0,type:"false_far",subject:"Бокс"},
+    {id:"Q118",text:"Хоккей — это музыкальный жанр",answer:0,type:"false_far",subject:"Хоккей"},
+    {id:"Q119",text:"Плавание — это язык",answer:0,type:"false_far",subject:"Плавание"},
+    {id:"Q120",text:"Бег — это напиток",answer:0,type:"false_far",subject:"Бег"}
 ];
 
 let participantId = "";
@@ -484,10 +454,10 @@ function sendResultsToTelegram() {
         typeStats += `• ${type}: ${avg}мс (верно ${data.correct}/${data.count})\n`;
     }
     
-    const message = `📊 <b>Результаты теста</b>\n\n` +
+    const message = ` <b>Результаты теста (60 вопросов)</b>\n\n` +
         `👤 <b>Участник:</b> ${participantId}\n` +
         `✅ <b>Правильных:</b> ${correct}/${total}\n` +
-        `⏱ <b>Среднее время:</b> ${avgTime} мс\n\n` +
+        ` <b>Среднее время:</b> ${avgTime} мс\n\n` +
         `📈 <b>По типам вопросов:</b>\n${typeStats}`;
     
     fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
@@ -513,7 +483,7 @@ function sendResultsToTelegram() {
     const formData = new FormData();
     formData.append('chat_id', CHAT_ID);
     formData.append('document', blob, `results_${participantId}_${Date.now()}.csv`);
-    formData.append('caption', `Полные результаты: ${participantId}`);
+    formData.append('caption', `Полные результаты (60 вопросов): ${participantId}`);
     
     fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendDocument`, {
         method: 'POST',
@@ -548,7 +518,6 @@ function downloadResults() {
     document.body.removeChild(link);
 }
 
-// Клавиатурное управление (для ноута)
 document.addEventListener('keydown', function(e) {
     if (e.code === 'Space') {
         e.preventDefault();
@@ -564,7 +533,6 @@ document.addEventListener('keydown', function(e) {
     }
 });
 
-// Запрет масштабирования на мобильных (чтобы двойной тап не зумил)
 document.addEventListener('touchstart', function(e) {
     if (e.touches.length > 1) e.preventDefault();
 }, { passive: false });
